@@ -1,0 +1,35 @@
+name: Unzip project
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'MacroRecorder.zip'
+
+permissions:
+  contents: write
+
+jobs:
+  unzip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract zip and move files to the top level
+        run: |
+          if [ ! -f MacroRecorder.zip ]; then
+            echo "No MacroRecorder.zip found, nothing to do"
+            exit 0
+          fi
+          unzip -o MacroRecorder.zip -d extracted
+          shopt -s dotglob
+          mv extracted/MacroRecorder/* .
+          rm -rf extracted MacroRecorder.zip
+
+      - name: Commit extracted files
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add -A
+          git commit -m "Extract project" || echo "Nothing to commit"
+          git push
