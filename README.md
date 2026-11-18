@@ -14,7 +14,15 @@ Scripts can also react to what is on screen (colors), which is how you automate 
 2. Tap **2. Start screen capture** and accept the prompt. Needed only for color commands (`waitcolor`, `findtap`, `ifcolor`, `track`, and the Pick button).
 3. A floating panel appears. Drag it with the ≡ handle. Keep it away from the areas your script scans, because screen capture can see it.
 
+## Steps list
+The main screen shows your script as a list of steps. **+ Add step** adds one (tap, hold, wait, find picture, reel...), **✎** edits its numbers, **↑ ↓** move it, **✕** deletes it, and everything saves automatically. **Copy script** and **Paste script** use the clipboard. The script text underneath is the same thing for advanced edits.
+
+## Rod settings
+Under **Rod settings** on the main screen you can save a rod by name with its own **cast hold time** and **reel sensitivity**, then pick it again later with **Choose saved rod**. The script command `cast X Y` holds for the active rod's cast time, and `reel` uses its sensitivity. You can also turn the green/red detection arrows off.
+
 ## Fisch (Roblox) quick start
+Tap **▶ Play** on the panel: if nothing is set up yet it opens the 🐟 setup for you instead of running a dummy script.
+
 The Fisch rules allow macros as long as they don't go beyond human ability, but they don't recommend them. You use this at your own risk.
 
 1. Do the first-time setup above, then open Fisch.
@@ -49,6 +57,8 @@ One command per line. Lines starting with `#` or `//` are comments. Colors are `
 | `track FISH BAR X1 Y1 X2 Y2 PRESSX PRESSY MAXMS [TOL] [invert]` | reel minigame helper (below) |
 | `findimg NAME [TIMEOUT_MS] [TOL]` | find a saved picture (made with Crop) on screen and tap its center |
 | `waitimg NAME [TIMEOUT_MS] [TOL]` | wait until a saved picture is on screen (no tap) |
+| `waitgone NAME [TIMEOUT_MS] [TOL]` | wait until a saved picture is no longer on screen |
+| `ifimg NAME [TOL]` ... `end` | run the lines inside only if the picture is on screen right now |
 | `until RRGGBB X1 Y1 X2 Y2 [TOL] [TIMEOUT_MS]` ... `end` | repeat the lines inside until the color appears inside the box |
 
 The repeat count and speed in the app wrap around the whole script.
