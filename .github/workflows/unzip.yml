@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - 'MacroRecorder.zip'
+      - 'broooo.zip'
 
 permissions:
   contents: write
