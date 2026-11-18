@@ -19,7 +19,7 @@ The Fisch rules allow macros as long as they don't go beyond human ability, but 
 
 1. Do the first-time setup above, then open Fisch.
 2. **Round 1/2**: cast, and when the **SHAKE button** is on screen tap **🐟 1/2** on the panel. The screen freezes. Tap where you press and hold to cast, then drag a box around the shake button (Skip if there isn't one).
-3. **Round 2/2**: when the **reel bar** is on screen tap **🐟 2/2**. Tap the fish icon, tap your bar, then drag a box around the whole reel bar.
+3. **Round 2/2**: when the **reel bar** is on screen tap **🐟 2/2**, then drag a thin box around the long dark reel strip. No colors to pick: the `reel` command finds the bar (white, red or any color) and the thin fish line by itself.
 4. The app writes the script for you. Go to the idle screen and tap **▶ Play**. While it runs, the panel shrinks to Play/Stop so it stays out of the way of the color scans.
 
 While it runs you get a live status line on the panel (Casting, Waiting for bite, Reeling, and a catch counter) and an overlay on the reel bar: a white outline around the reel area, a **green arrow above it where the app sees the fish** and a **red arrow below it where it sees your bar**. If the arrows aren't following the fish and bar, the colors or box need redoing (run the 🐟 setup again).
