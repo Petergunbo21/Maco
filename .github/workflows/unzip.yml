@@ -22,7 +22,7 @@ jobs:
             exit 0
           fi
           unzip -o MacroRecorder.zip -d extracted
-          cp -a extracted/MacroRecorder/. ./
+          rm -rf extracted/MacroRecorder/.github/workflows && cp -a extracted/MacroRecorder/. ./
           rm -rf extracted MacroRecorder.zip
 
       - name: Commit extracted files
