@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - 'broooo.zip'
+      - '*.zip'
 
 permissions:
   contents: write
@@ -17,13 +17,27 @@ jobs:
 
       - name: Extract zip and merge files into the top level
         run: |
-          if [ ! -f MacroRecorder.zip ]; then
-            echo "No MacroRecorder.zip found, nothing to do"
+          shopt -s nullglob
+          zips=(*.zip)
+          if [ ${#zips[@]} -eq 0 ]; then
+            echo "No zip file found in the repo root, nothing to do"
             exit 0
           fi
-          unzip -o MacroRecorder.zip -d extracted
-          rm -rf extracted/MacroRecorder/.github/workflows && cp -a extracted/MacroRecorder/. ./
-          rm -rf extracted MacroRecorder.zip
+          for z in "${zips[@]}"; do
+            echo "Extracting $z"
+            rm -rf extracted
+            unzip -o "$z" -d extracted
+            f=$(find extracted -name settings.gradle.kts | head -n 1)
+            if [ -z "$f" ]; then
+              echo "::error::No settings.gradle.kts inside $z"
+              exit 1
+            fi
+            dir=$(dirname "$f")
+            # Workflow files can't be pushed by this job, so skip the zip's .github folder.
+            rm -rf "$dir/.github"
+            cp -a "$dir"/. ./
+            rm -rf extracted "$z"
+          done
 
       - name: Commit extracted files
         run: |
