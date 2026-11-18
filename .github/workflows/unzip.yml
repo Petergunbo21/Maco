@@ -15,15 +15,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Extract zip and move files to the top level
+      - name: Extract zip and merge files into the top level
         run: |
           if [ ! -f MacroRecorder.zip ]; then
             echo "No MacroRecorder.zip found, nothing to do"
             exit 0
           fi
           unzip -o MacroRecorder.zip -d extracted
-          shopt -s dotglob
-          mv extracted/MacroRecorder/* .
+          cp -a extracted/MacroRecorder/. ./
           rm -rf extracted MacroRecorder.zip
 
       - name: Commit extracted files
