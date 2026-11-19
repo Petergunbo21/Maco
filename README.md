@@ -17,8 +17,11 @@ Scripts can also react to what is on screen (colors), which is how you automate 
 ## Steps list
 The main screen shows your script as a list of steps. **+ Add step** adds one (tap, hold, wait, find picture, reel...), **✎** edits its numbers, **↑ ↓** move it, **✕** deletes it, and everything saves automatically. **Copy script** and **Paste script** use the clipboard. The script text underneath is the same thing for advanced edits.
 
+## Placing the reel box by dragging
+Tap **⬚ Box** on the panel while the reel bar is on screen. A teal rectangle appears on top of the game: drag it onto the long dark reel strip, drag its corner triangle to resize it, then tap **Save**. The new box is written into every `reel` and `untilreel` step of your script.
+
 ## Rod settings
-Under **Rod settings** on the main screen you can save a rod by name with its own **cast hold time** and **reel sensitivity**, then pick it again later with **Choose saved rod**. The script command `cast X Y` holds for the active rod's cast time, and `reel` uses its sensitivity. You can also turn the green/red detection arrows off.
+Under **Rod settings** on the main screen you can save a rod by name with its own **cast hold time** and **reel sensitivity**, then pick it again later with **Choose saved rod**. The script command `cast X Y` holds for the active rod's cast time, and `reel` uses its sensitivity. You can also turn the green/red detection arrows off. Rods with 100% lure speed have no SHAKE button, so each rod has a **has SHAKE button** switch; the `shake` command taps the SHAKE button only when the active rod has one.
 
 ## Fisch (Roblox) quick start
 Tap **▶ Play** on the panel: if nothing is set up yet it opens the 🐟 setup for you instead of running a dummy script.
@@ -91,3 +94,21 @@ Version 1.1 is signed with a fixed key, so later updates install over it and kee
 - Needs Android 8.0 or newer.
 - Taps use fixed screen positions, so the game must be in the same orientation each time. Start screen capture with the game's orientation if you can; it follows rotation.
 - Check each game's rules about automation before using it.
+
+## Abstract Builder (v2.1)
+
+Open the app and tap **🧩 Abstract Builder**. It is a visual, no-code editor in the style of Macrorify's Abstract Mode.
+
+* **Project → Jobs → Rules.** A rule says *WHEN* conditions are true, *DO* actions.
+* **Job scope.** *Once* = one pass, every rule whose conditions are true runs, top to bottom.
+  *Continuous* = repeats; each pass only the **first** matching rule runs, so put high-priority checks at the top (use ↑ ↓).
+* **Conditions.** *Image appears / does NOT appear* (with a search area and a similarity %), or *Variable* compares (==, !=, >, <, >=, <=).
+  A rule's conditions are combined with **ALL (AND)** or **ANY (OR)**.
+* **Actions.** Tap, Tap image, Swipe, Joystick drag (slow hold-drag), Wait, Set variable (set / add / toggle), Run job, Custom action.
+* **Custom actions.** A reusable block of actions you can run from any rule.
+* **Variables.** bool / number / string with a starting value.
+* **Watchdog.** In Job settings set *failed passes in a row* (e.g. 10) and a *Recovery job*. If nothing matches that many passes in a row, the recovery job runs and the job restarts cleanly (optionally resetting variables).
+* **Test buttons.** *Test this condition / action*, *Test conditions / actions* wait 5 seconds so you can switch to your game, then run and write the result to the **Live log**.
+* **Start** from the builder (5 s countdown) or from the floating panel's **▶ Job** button (starts the main job at once). **■ Stop** ends it.
+* **Pictures.** Save images with **▭ Crop** on the floating panel, then pick them by name in the editor.
+* **Draw on screen.** "Draw the area on screen" / "Place on screen" hide the app, wait 4 s, then show a drag box over your game.
