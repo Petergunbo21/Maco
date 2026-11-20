@@ -1,30 +1,61 @@
 
-name: Extract ROOK Project
+name: Build THE ROOK APK
 
 on:
   workflow_dispatch:
   push:
-    paths:
-      - 'ROOK_Fisch_Macro_Advisor_Android_Source.zip'
+    branches: [main, master]
 
 permissions:
   contents: read
 
 jobs:
-  extract:
+  build:
     runs-on: ubuntu-latest
 
     steps:
       - name: Download repository
         uses: actions/checkout@v4
 
-      - name: Extract ROOK ZIP
-        run: |
-          mkdir -p ROOK_AI
-          unzip -o ROOK_Fisch_Macro_Advisor_Android_Source.zip -d ROOK_AI
+      - name: Install Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
 
-      - name: Upload extracted project
+      - name: Extract Android project
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y unzip
+
+          unzip -q ROOK_Fisch_Macro_Advisor_Android_Source.zip -d extracted
+
+          SETTINGS=$(find extracted -name settings.gradle -type f | head -n 1)
+
+          if [ -z "$SETTINGS" ]; then
+            echo "ERROR: settings.gradle was not found in the ZIP."
+            find extracted -maxdepth 4 -type f
+            exit 1
+          fi
+
+          PROJECT_DIR=$(dirname "$SETTINGS")
+          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
+
+          echo "Found Android project:"
+          ls -la "$PROJECT_DIR"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Build APK
+        run: |
+          cd "$PROJECT_DIR"
+          gradle assembleDebug
+
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: ROOK_AI_Extracted
-          path: ROOK_AI/
+          name: THE-ROOK-APK
+          path: ${{ env.PROJECT_DIR }}/app/build/outputs/apk/debug/app-debug.apk
