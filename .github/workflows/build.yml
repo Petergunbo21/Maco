@@ -1,84 +1,20 @@
 
-name: THE ROOK - One Click APK Builder
-
-on:
-  workflow_dispatch:
-  push:
-    branches: [main, master]
-
-permissions:
-  contents: read
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Install Java
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      - name: Extract project
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y unzip
-
-          mkdir -p extracted
-          unzip -oq ROOK_Fisch_Macro_Advisor_Android_Source.zip -d extracted
-
-          SETTINGS=$(find extracted -name settings.gradle -type f | head -n 1)
-
-          if [ -z "$SETTINGS" ]; then
-            echo "ERROR: settings.gradle not found."
-            exit 1
-          fi
-
-          PROJECT_DIR=$(dirname "$SETTINGS")
-          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
-
-      - name: Configure repositories
+      - name: Build APK with detailed errors
         run: |
           cd "$PROJECT_DIR"
+          gradle assembleDebug \
+            --refresh-dependencies \
+            --stacktrace \
+            --info 2>&1 | tee build-log.txt
+          
+          BUILD_STATUS=${PIPESTATUS[0]}
+          echo "Build exit code: $BUILD_STATUS"
+          exit $BUILD_STATUS
 
-          cat > settings.gradle <<'EOF'
-          pluginManagement {
-              repositories {
-                  google()
-                  mavenCentral()
-                  gradlePluginPortal()
-              }
-          }
-
-          dependencyResolutionManagement {
-              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-              repositories {
-                  google()
-                  mavenCentral()
-              }
-          }
-
-          rootProject.name = 'ROOK_Fisch_Macro'
-          include ':app'
-          EOF
-
-      - name: Install Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.9'
-
-      - name: Build APK
-        run: |
-          cd "$PROJECT_DIR"
-          gradle assembleDebug --refresh-dependencies --stacktrace
-
-      - name: Upload APK
+      - name: Save build error log
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: THE-ROOK-APK
-          path: ${{ env.PROJECT_DIR }}/app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error
+          name: ROOK-BUILD-LOG
+          path: ${{ env.PROJECT_DIR }}/build-log.txt
+          if-no-files-found: ignore
