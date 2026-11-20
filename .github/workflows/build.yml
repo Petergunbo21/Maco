@@ -1,43 +1,30 @@
-name: Build APK
+
+name: Extract ROOK Project
 
 on:
-  push:
-    branches: [main, master]
   workflow_dispatch:
+  push:
+    paths:
+      - 'ROOK_Fisch_Macro_Advisor_Android_Source.zip'
+
+permissions:
+  contents: read
 
 jobs:
-  build:
+  extract:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Download repository
+        uses: actions/checkout@v4
 
-      - name: Find the project folder
-        id: find
+      - name: Extract ROOK ZIP
         run: |
-          f=$(find . -name settings.gradle.kts -not -path "*/.git/*" | head -n 1)
-          if [ -z "$f" ]; then
-            echo "::error::settings.gradle.kts was not found. Upload every file from the MacroRecorder folder."
-            find . -not -path "*/.git/*" -type f | head -n 50
-            exit 1
-          fi
-          dir=$(dirname "$f")
-          echo "Project folder: $dir"
-          echo "dir=$dir" >> "$GITHUB_OUTPUT"
+          mkdir -p ROOK_AI
+          unzip -o ROOK_Fisch_Macro_Advisor_Android_Source.zip -d ROOK_AI
 
-      - uses: actions/setup-java@v4
+      - name: Upload extracted project
+        uses: actions/upload-artifact@v4
         with:
-          distribution: temurin
-          java-version: 17
-
-      - uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: 8.7
-
-      - name: Build debug APK
-        working-directory: ${{ steps.find.outputs.dir }}
-        run: gradle assembleDebug
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: MacroRecorder-apk
-          path: ${{ steps.find.outputs.dir }}/app/build/outputs/apk/debug/app-debug.apk
+          name: ROOK_AI_Extracted
+          path: ROOK_AI/
