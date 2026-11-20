@@ -1,48 +1,30 @@
-name: Unzip project
+
+name: Extract ROOK Project
 
 on:
   workflow_dispatch:
   push:
     paths:
-      - '*.zip'
+      - 'ROOK_Fisch_Macro_Advisor_Android_Source.zip'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  unzip:
+  extract:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Download repository
+        uses: actions/checkout@v4
 
-      - name: Extract zip and merge files into the top level
+      - name: Extract ROOK ZIP
         run: |
-          shopt -s nullglob
-          zips=(*.zip)
-          if [ ${#zips[@]} -eq 0 ]; then
-            echo "No zip file found in the repo root, nothing to do"
-            exit 0
-          fi
-          for z in "${zips[@]}"; do
-            echo "Extracting $z"
-            rm -rf extracted
-            unzip -o "$z" -d extracted
-            f=$(find extracted -name settings.gradle.kts | head -n 1)
-            if [ -z "$f" ]; then
-              echo "::error::No settings.gradle.kts inside $z"
-              exit 1
-            fi
-            dir=$(dirname "$f")
-            # Workflow files can't be pushed by this job, so skip the zip's .github folder.
-            rm -rf "$dir/.github"
-            cp -a "$dir"/. ./
-            rm -rf extracted "$z"
-          done
+          mkdir -p ROOK_AI
+          unzip -o ROOK_Fisch_Macro_Advisor_Android_Source.zip -d ROOK_AI
 
-      - name: Commit extracted files
-        run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git add -A
-          git commit -m "Extract project" || echo "Nothing to commit"
-          git push
+      - name: Upload extracted project
+        uses: actions/upload-artifact@v4
+        with:
+          name: ROOK_AI_Extracted
+          path: ROOK_AI/
