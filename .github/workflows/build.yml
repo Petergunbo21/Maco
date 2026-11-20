@@ -1,20 +1,76 @@
 
-      - name: Build APK with detailed errors
+name: THE ROOK - Automatic APK Builder
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Extract project
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y unzip
+          mkdir -p extracted
+          unzip -oq ROOK_Fisch_Macro_Advisor_Android_Source.zip -d extracted
+          SETTINGS=$(find extracted -name settings.gradle -type f | head -n 1)
+          test -n "$SETTINGS"
+          PROJECT_DIR=$(dirname "$SETTINGS")
+          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
+
+      - name: Fix Android resources
         run: |
           cd "$PROJECT_DIR"
-          gradle assembleDebug \
-            --refresh-dependencies \
-            --stacktrace \
-            --info 2>&1 | tee build-log.txt
-          
-          BUILD_STATUS=${PIPESTATUS[0]}
-          echo "Build exit code: $BUILD_STATUS"
-          exit $BUILD_STATUS
+          mkdir -p app/src/main/res/values
+          cat > app/src/main/res/xml/accessibility_service_config.xml <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <accessibility-service
+              xmlns:android="http://schemas.android.com/apk/res/android"
+              android:description="@string/accessibility_description"
+              android:accessibilityEventTypes="typeWindowStateChanged|typeWindowContentChanged"
+              android:accessibilityFeedbackType="feedbackGeneric"
+              android:notificationTimeout="100"
+              android:canPerformGestures="true"
+              android:canRetrieveWindowContent="true" />
+          EOF
 
-      - name: Save build error log
-        if: always()
+          cat > app/src/main/res/values/strings.xml <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources>
+              <string name="app_name">THE ROOK</string>
+              <string name="accessibility_description">Runs user-configured touch macros when enabled by the user.</string>
+          </resources>
+          EOF
+
+      - name: Install Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Build APK
+        run: |
+          cd "$PROJECT_DIR"
+          gradle assembleDebug --refresh-dependencies
+
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: ROOK-BUILD-LOG
-          path: ${{ env.PROJECT_DIR }}/build-log.txt
-          if-no-files-found: ignore
+          name: THE-ROOK-APK
+          path: ${{ env.PROJECT_DIR }}/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
